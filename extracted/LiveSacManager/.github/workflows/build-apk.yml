@@ -1,0 +1,29 @@
+name: Compiler l'APK
+
+# Se lance à chaque envoi sur GitHub, ou à la main : onglet Actions > Compiler l'APK > Run workflow
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Tests unitaires
+        run: chmod +x gradlew && ./gradlew testDebugUnitTest
+      - name: Compiler l'APK de débogage
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiveSacManager-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rapport-tests
+          path: app/build/reports/tests/
